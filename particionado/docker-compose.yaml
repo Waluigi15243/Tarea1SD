@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  caching1:
+    image: bitnami/redis:6.0.16
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./data/redis1:/bitnami/redis/data
+    ports:
+      - "6379:6379"
+
+  caching2:
+    image: bitnami/redis:6.0.16
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./data/redis2:/bitnami/redis/data
+    ports:
+      - "6380:6379"
+
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - REDIS_HOSTS=caching1:6379,caching2:6379  # Lista de instancias Redis
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api/index.js:/app/index.js

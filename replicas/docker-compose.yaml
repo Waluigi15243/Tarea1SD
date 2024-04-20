@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  redis-master:
+    image: redis
+    container_name: redis-master
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-net
+
+  redis-replica1:
+    image: redis
+    container_name: redis-replica1
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+    networks:
+      - redis-net
+
+  redis-replica2:
+    image: redis
+    container_name: redis-replica2
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+    networks:
+      - redis-net
+
+  api:
+    build: ./api
+    container_name: api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis-master
+      - redis-replica1
+      - redis-replica2
+    environment:
+      - REDIS_HOST=redis-master
+    networks:
+      - redis-net
+
+networks:
+  redis-net:
