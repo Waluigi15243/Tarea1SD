@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Car {
+    int32 id = 1;
+    string name = 2;
+}
+
+message GetCarRequest {
+    int32 id = 1;
+}
+
+service SearchCars {
+    rpc GetCar(GetCarRequest) returns (Car);
+}
